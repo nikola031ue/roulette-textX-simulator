@@ -13,14 +13,15 @@ Krajnji korisnici ovog jezika bi bili igrači koji žele da testiraju svoje stra
 
 # Sintaksa
 Primer osnovne sintakse
-    ```
-    bankroll 500
-    bet red 20
-    spin
+```
+bankroll 500
+bet red 20
+spin
 
-    show_balance
-    cash_out
-    ```
+show_balance
+cash_out
+```
+
 ## Komande
 Komande koje korisnik može da zadaje su vezane za upravljanje novcem (bankroll, cach_out), opklade (bet red 20, bet number 7 5, bet even 20...), tok igre (spin, repeat broj_ponavljanja {...}), kontrola rizika (stop_on_win/loss int), logika za automatizaciju (if_win/lose {...}, double_bet) i informacije (show_stats, show_history).
 
