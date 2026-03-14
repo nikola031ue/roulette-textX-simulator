@@ -1,0 +1,205 @@
+
+    digraph textX {
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    node[
+        shape=record,
+        style=filled,
+        fillcolor=aliceblue
+    ]
+    nodesep = 0.3
+    edge[dir=black,arrowtail=empty]
+
+
+2844430389936[ label="{Game|}"]
+
+2844430862608[ label="{*Statement|}"]
+
+2844430862928[ label="{Bankroll|amount: INT\l}"]
+
+2844404169648[ label="{Round|}"]
+
+2844430501136[ label="{*RoundStatement|}"]
+
+2844430437552[ label="{Strategy|name: ID\l}"]
+
+2844404922256[ label="{Bet|amount: INT\l}"]
+
+2844404919808[ label="{*BetType|}"]
+
+2844430426960[ label="{NumberBet|number: INT\l}"]
+
+2844430422864[ label="{ColorBet|color: Color\l}"]
+
+2844430229792[ label="{ParityBet|parity: Parity\l}"]
+
+2844430203184[ label="{RangeBet|range: Range\l}"]
+
+2844403121424[ label="{DozenBet|dozen: INT\l}"]
+
+2844430904272[ label="{ColumnBet|column: INT\l}"]
+
+2844431066480[ label="{SplitBet|numbers: list[INT]\l}"]
+
+2844431066656[ label="{StreetBet|numbers: list[INT]\l}"]
+
+2844430776784[ label="{CornerBet|numbers: list[INT]\l}"]
+
+2844430776944[ label="{SixLineBet|numbers: list[INT]\l}"]
+
+2844404899648[ label="{BasketBet|cmd: STRING\l}"]
+
+2844430257232[ label="{Spin|cmd: STRING\l}"]
+
+2844430962640[ label="{ClearBets|cmd: STRING\l}"]
+
+2844430963408[ label="{CashOut|cmd: STRING\l}"]
+
+2844430963280[ label="{*ControlCommand|}"]
+
+2844430962512[ label="{DoubleBet|cmd: STRING\l}"]
+
+2844430963536[ label="{ResetBet|cmd: STRING\l}"]
+
+2844430963664[ label="{*StopCondition|}"]
+
+2844430963792[ label="{StopOnWin|amount: INT\l}"]
+
+2844430963920[ label="{StopOnLoss|amount: INT\l}"]
+
+2844430964048[ label="{RepeatBlock|times: INT\l}"]
+
+2844430964176[ label="{WhileBlock|}"]
+
+2844430964304[ label="{*Condition|}"]
+
+2844430964432[ label="{CompoundCondition|logic_op: LogicOperator\l}"]
+
+2844430964560[ label="{*SimpleCondition|}"]
+
+2844430964688[ label="{BalanceCondition|operator: ComparisonOperator\lamount: INT\l}"]
+
+2844430964816[ label="{ConsecutiveWins|operator: ComparisonOperator\lcount: INT\l}"]
+
+2844430964944[ label="{ConsecutiveLosses|operator: ComparisonOperator\lcount: INT\l}"]
+
+2844430965072[ label="{RoundProfitCondition|operator: ComparisonOperator\lamount: INT\l}"]
+
+2844430965456[ label="{*IfBlock|}"]
+
+2844430965584[ label="{IfWin|}"]
+
+2844430965712[ label="{IfLose|}"]
+
+2844430965840[ label="{ElseBlock|}"]
+
+2844430965968[ label="{ConditionalIfBlock|}"]
+
+2844430966096[ label="{*FlowControl|}"]
+
+2844430966224[ label="{BreakCommand|cmd: STRING\l}"]
+
+2844430966352[ label="{ContinueCommand|cmd: STRING\l}"]
+
+2844430966480[ label="{SkipRoundCommand|cmd: STRING\l}"]
+
+2844430966608[ label="{ShowStats|cmd: STRING\l}"]
+
+2844430966736[ label="{ShowHistory|cmd: STRING\l}"]
+
+2844430966864[ label="{ShowBalance|cmd: STRING\l}"]
+
+
+
+2844430389936 -> 2844430862608[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+2844430862608 -> 2844430862928 [dir=back]
+2844430862608 -> 2844404169648 [dir=back]
+2844430862608 -> 2844430437552 [dir=back]
+2844430862608 -> 2844430966608 [dir=back]
+2844430862608 -> 2844430966736 [dir=back]
+2844430862608 -> 2844430966864 [dir=back]
+2844430862608 -> 2844404922256 [dir=back]
+2844430862608 -> 2844430257232 [dir=back]
+2844430862608 -> 2844430962640 [dir=back]
+2844430862608 -> 2844430963408 [dir=back]
+2844430862608 -> 2844430964048 [dir=back]
+2844430862608 -> 2844430964176 [dir=back]
+2844430862608 -> 2844430965456 [dir=back]
+2844430862608 -> 2844430965968 [dir=back]
+2844430862608 -> 2844430966096 [dir=back]
+2844404169648 -> 2844430501136[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+2844430501136 -> 2844404922256 [dir=back]
+2844430501136 -> 2844430257232 [dir=back]
+2844430501136 -> 2844430962640 [dir=back]
+2844430501136 -> 2844430965456 [dir=back]
+2844430501136 -> 2844430965968 [dir=back]
+2844430501136 -> 2844430963280 [dir=back]
+2844430501136 -> 2844430966864 [dir=back]
+2844430501136 -> 2844430966608 [dir=back]
+2844430501136 -> 2844430966736 [dir=back]
+2844430501136 -> 2844430966096 [dir=back]
+2844430437552 -> 2844430862608[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+2844404922256 -> 2844404919808[arrowtail=diamond, dir=both, headlabel="bet_type "]
+2844404919808 -> 2844430426960 [dir=back]
+2844404919808 -> 2844430422864 [dir=back]
+2844404919808 -> 2844430229792 [dir=back]
+2844404919808 -> 2844430203184 [dir=back]
+2844404919808 -> 2844403121424 [dir=back]
+2844404919808 -> 2844430904272 [dir=back]
+2844404919808 -> 2844431066480 [dir=back]
+2844404919808 -> 2844431066656 [dir=back]
+2844404919808 -> 2844430776784 [dir=back]
+2844404919808 -> 2844430776944 [dir=back]
+2844404919808 -> 2844404899648 [dir=back]
+2844430963280 -> 2844430962512 [dir=back]
+2844430963280 -> 2844430963536 [dir=back]
+2844430963280 -> 2844430963664 [dir=back]
+2844430963664 -> 2844430963792 [dir=back]
+2844430963664 -> 2844430963920 [dir=back]
+2844430964048 -> 2844430862608[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+2844430964176 -> 2844430964304[arrowtail=diamond, dir=both, headlabel="condition "]
+2844430964176 -> 2844430862608[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+2844430964304 -> 2844430964432 [dir=back]
+2844430964304 -> 2844430964560 [dir=back]
+2844430964432 -> 2844430964560[arrowtail=diamond, dir=both, headlabel="left "]
+2844430964432 -> 2844430964560[arrowtail=diamond, dir=both, headlabel="right "]
+2844430964560 -> 2844430964688 [dir=back]
+2844430964560 -> 2844430964816 [dir=back]
+2844430964560 -> 2844430964944 [dir=back]
+2844430964560 -> 2844430965072 [dir=back]
+2844430965456 -> 2844430965584 [dir=back]
+2844430965456 -> 2844430965712 [dir=back]
+2844430965584 -> 2844430862608[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+2844430965584 -> 2844430965840[arrowtail=diamond, dir=both, headlabel="else_part "]
+2844430965712 -> 2844430862608[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+2844430965712 -> 2844430965840[arrowtail=diamond, dir=both, headlabel="else_part "]
+2844430965840 -> 2844430862608[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+2844430965968 -> 2844430964304[arrowtail=diamond, dir=both, headlabel="condition "]
+2844430965968 -> 2844430862608[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+2844430965968 -> 2844430965840[arrowtail=diamond, dir=both, headlabel="else_part "]
+2844430966096 -> 2844430966224 [dir=back]
+2844430966096 -> 2844430966352 [dir=back]
+2844430966096 -> 2844430966480 [dir=back]
+match_rules [ shape=plaintext, label=< <table>
+	<tr>
+		<td><b>Color</b></td><td>red|black</td>
+	</tr>
+	<tr>
+		<td><b>Comment</b></td><td>\/\/.*$</td>
+	</tr>
+	<tr>
+		<td><b>ComparisonOperator</b></td><td>&gt;=|&lt;=|==|!=|&gt;|&lt;</td>
+	</tr>
+	<tr>
+		<td><b>LogicOperator</b></td><td>and|or</td>
+	</tr>
+	<tr>
+		<td><b>Parity</b></td><td>even|odd</td>
+	</tr>
+	<tr>
+		<td><b>Range</b></td><td>low|high</td>
+	</tr>
+</table> >]
+
+
+}

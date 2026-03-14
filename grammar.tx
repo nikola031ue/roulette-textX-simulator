@@ -1,0 +1,235 @@
+// textX Grammar za Rulet DSL
+
+Game:
+    statements*=Statement
+;
+
+Statement:
+    Bankroll | Round | Strategy | ShowStats | ShowHistory | ShowBalance | 
+    Bet | Spin | ClearBets | CashOut | RepeatBlock | WhileBlock | IfBlock | 
+    ConditionalIfBlock | FlowControl
+;
+
+// Osnovne komande
+Bankroll:
+    'bankroll' amount=INT
+;
+
+Round:
+    'round' '{' statements*=RoundStatement '}'
+;
+
+RoundStatement:
+    Bet | Spin | ClearBets | IfBlock | ConditionalIfBlock | ControlCommand | 
+    ShowBalance | ShowStats | ShowHistory | FlowControl
+;
+
+Strategy:
+    'strategy' name=ID '{' statements*=Statement '}'
+;
+
+Bet:
+    'bet' bet_type=BetType amount=INT
+;
+
+BetType:
+    NumberBet | ColorBet | ParityBet | RangeBet | DozenBet | ColumnBet |
+    SplitBet | StreetBet | CornerBet | SixLineBet | BasketBet
+;
+
+// Tipovi opklada - Outside Bets
+NumberBet:
+    'number' number=INT  // 0-36
+;
+
+ColorBet:
+    color=Color
+;
+
+Color:
+    'red' | 'black'
+;
+
+ParityBet:
+    parity=Parity
+;
+
+Parity:
+    'even' | 'odd'
+;
+
+RangeBet:
+    range=Range
+;
+
+Range:
+    'low' | 'high'  // low=1-18, high=19-36
+;
+
+DozenBet:
+    'dozen' dozen=INT  // 1, 2, 3
+;
+
+ColumnBet:
+    'column' column=INT  // 1, 2, 3
+;
+
+// Tipovi opklada - Inside Bets
+SplitBet:
+    'split' numbers+=INT[',']  // mora biti 2 broja
+;
+
+StreetBet:
+    'street' numbers+=INT[',']  // mora biti 3 broja
+;
+
+CornerBet:
+    'corner' numbers+=INT[',']  // mora biti 4 broja
+;
+
+SixLineBet:
+    'sixline' numbers+=INT[',']  // mora biti 6 brojeva
+;
+
+BasketBet:
+    cmd='basket'  // 0,1,2,3
+;
+
+// Kontrolne komande
+Spin:
+    cmd='spin'
+;
+
+ClearBets:
+    cmd='clear_bets'
+;
+
+CashOut:
+    cmd='cash_out'
+;
+
+ControlCommand:
+    DoubleBet | ResetBet | StopCondition
+;
+
+DoubleBet:
+    cmd='double_bet'
+;
+
+ResetBet:
+    cmd='reset_bet'
+;
+
+StopCondition:
+    StopOnWin | StopOnLoss
+;
+
+StopOnWin:
+    'stop_on_win' amount=INT
+;
+
+StopOnLoss:
+    'stop_on_loss' amount=INT
+;
+
+// Strukturne komande
+RepeatBlock:
+    'repeat' times=INT '{' statements*=Statement '}'
+;
+
+WhileBlock:
+    'while' '(' condition=Condition ')' '{' statements*=Statement '}'
+;
+
+// Uslovi
+Condition:
+    CompoundCondition | SimpleCondition
+;
+
+CompoundCondition:
+    left=SimpleCondition logic_op=LogicOperator right=SimpleCondition
+;
+
+SimpleCondition:
+    BalanceCondition | ConsecutiveWins | ConsecutiveLosses | RoundProfitCondition
+;
+
+BalanceCondition:
+    'balance' operator=ComparisonOperator amount=INT
+;
+
+ConsecutiveWins:
+    'consecutive_wins' operator=ComparisonOperator count=INT
+;
+
+ConsecutiveLosses:
+    'consecutive_losses' operator=ComparisonOperator count=INT
+;
+
+RoundProfitCondition:
+    'round_profit' operator=ComparisonOperator amount=INT
+;
+
+ComparisonOperator:
+    '>=' | '<=' | '==' | '!=' | '>' | '<'
+;
+
+LogicOperator:
+    'and' | 'or'
+;
+
+IfBlock:
+    IfWin | IfLose
+;
+
+IfWin:
+    'if_win' '{' statements*=Statement '}' (else_part=ElseBlock)?
+;
+
+IfLose:
+    'if_lose' '{' statements*=Statement '}' (else_part=ElseBlock)?
+;
+
+ElseBlock:
+    'else' '{' statements*=Statement '}'
+;
+
+// Uslovna if naredba
+ConditionalIfBlock:
+    'if' '(' condition=Condition ')' '{' statements*=Statement '}' (else_part=ElseBlock)?
+;
+
+// Kontrola toka
+FlowControl:
+    BreakCommand | ContinueCommand | SkipRoundCommand
+;
+
+BreakCommand:
+    cmd='break'
+;
+
+ContinueCommand:
+    cmd='continue'
+;
+
+SkipRoundCommand:
+    cmd='skip_round'
+;
+
+// Informativne komande
+ShowStats:
+    cmd='show_stats'
+;
+
+ShowHistory:
+    cmd='show_history'
+;
+
+ShowBalance:
+    cmd='show_balance'
+;
+
+// Komentari
+Comment:
+    /\/\/.*$/
+;

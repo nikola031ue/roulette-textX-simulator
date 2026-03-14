@@ -42,3 +42,28 @@ repeat 15 {
 cash_out
 ```
 
+# Validacija i Vizualizacija Gramatike
+
+## Provera ispravnosti textX gramatike
+Da biste proverili da li je `grammar.tx` fajl sintaksno ispravan, koristite textX komandu:
+```bash
+textx check grammar.tx
+```
+
+## Generisanje PNG vizualizacije gramatike
+Za vizualizaciju strukture gramatike, potrebno je generisati DOT fajl i konvertovati ga u PNG:
+
+1. **Generisanje DOT fajla iz textX gramatike:**
+```bash
+textx generate grammar.tx --target dot
+```
+Ova komanda generiše `grammar.dot` fajl koji opisuje strukturu gramatike.
+
+2. **Konvertovanje DOT fajla u PNG:**
+```bash
+dot -Tpng -O grammar.dot
+```
+Ova komanda kreira `grammar.dot.png` fajl sa vizuelnim prikazom gramatike.
+
+**Napomena:** Za generisanje slike potreban je Graphviz alat. Može se preuzeti sa [graphviz.org](https://graphviz.org/download/).
+
