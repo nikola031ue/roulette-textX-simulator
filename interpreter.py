@@ -74,7 +74,37 @@ class Roulet:
                 print("Error: sixline mora imati tacno 6 brojeva")
                 return False
 
-        return True   
+        return True 
+    def interpret(self, model):
+
+        for stmt in model.statements:
+            self.execute_statement(stmt)
+
+    def execute_statement(self, stmt):
+
+        stmt_type = stmt.__class__.__name__
+
+        if stmt_type == 'Bankroll':
+            self.handle_bankroll(stmt)
+
+        elif stmt_type == 'Bet':
+            self.handle_bet(stmt)
+
+        elif stmt_type == 'Spin':
+            self.handle_spin()
+
+        elif stmt_type == 'ShowBalance':
+            self.handle_show_balance()
+
+        elif stmt_type == 'CashOut':
+            self.handle_cash_out()  
+            
+    def handle_bankroll(self, stmt):
+
+        self.balance = stmt.amount
+
+        print(f"Balance postavljen na {self.balance}")
+             
 
 def main(file_name_to_interpret):
 
