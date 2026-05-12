@@ -1,3 +1,11 @@
-bankroll 500
-bet number 50 10
+bankroll 1000
+
+bet red 100
 spin
+
+bet number 17 20
+spin
+
+show_balance
+
+cash_out
