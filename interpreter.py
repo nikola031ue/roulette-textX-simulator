@@ -14,6 +14,10 @@ class Roulet:
     def __init__(self):
         self.balance = 0
         self.current_bets = []
+        self.consecutive_wins = 0
+        self.consecutive_losses = 0
+
+    self.round_profit = 0
     def is_model_semantically_valid(self, model):
 
         for stmt in model.statements:
@@ -107,7 +111,10 @@ class Roulet:
             self.handle_show_balance()
 
         elif stmt_type == 'CashOut':
-            self.handle_cash_out()  
+            self.handle_cash_out() 
+
+        elif stmt_type == 'RepeatBlock':
+            self.handle_repeat(stmt)     
             
     def handle_bankroll(self, stmt):
 
@@ -152,6 +159,20 @@ class Roulet:
 
         self.balance += total_win
 
+        self.round_profit = total_win
+
+        if total_win > 0:
+
+        self.consecutive_wins += 1
+        self.consecutive_losses = 0
+
+        else:
+
+        self.consecutive_losses += 1
+        self.consecutive_wins = 0
+
+print(f"Ukupan dobitak: {total_win}")
+
         print(f"Ukupan dobitak: {total_win}")
 
         self.current_bets.clear()
@@ -163,6 +184,15 @@ class Roulet:
     def handle_cash_out(self):
 
         print(f"Cash out: {self.balance}")   
+
+    def handle_repeat(self, stmt):
+
+    for _ in range(stmt.times):
+
+        for inner_stmt in stmt.statements:
+
+            self.execute_statement(inner_stmt)
+                
 
     def calculate_payout(self, bet_type, amount, result):
 
