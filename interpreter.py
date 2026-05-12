@@ -114,7 +114,10 @@ class Roulet:
             self.handle_cash_out() 
 
         elif stmt_type == 'RepeatBlock':
-            self.handle_repeat(stmt)     
+            self.handle_repeat(stmt) 
+
+        elif stmt_type == 'WhileBlock':
+            self.handle_while(stmt)        
             
     def handle_bankroll(self, stmt):
 
@@ -192,7 +195,14 @@ print(f"Ukupan dobitak: {total_win}")
         for inner_stmt in stmt.statements:
 
             self.execute_statement(inner_stmt)
-                
+
+    def handle_while(self, stmt):
+
+    while self.evaluate_condition(stmt.condition):
+
+        for inner_stmt in stmt.statements:
+
+            self.execute_statement(inner_stmt)            
 
     def calculate_payout(self, bet_type, amount, result):
 
