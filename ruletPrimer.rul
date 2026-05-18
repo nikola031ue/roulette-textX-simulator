@@ -9,3 +9,11 @@ spin
 show_balance
 
 cash_out
+
+bankroll 1000
+
+while(balance > 0) {
+
+    bet red 100
+    spin
+}
