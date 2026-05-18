@@ -14,6 +14,9 @@ class Roulet:
     def __init__(self):
         self.balance = 0
         self.current_bets = []
+        self.consecutive_wins = 0
+        self.consecutive_losses = 0
+        self.round_profit = 0
     def is_model_semantically_valid(self, model):
 
         for stmt in model.statements:
@@ -107,7 +110,13 @@ class Roulet:
             self.handle_show_balance()
 
         elif stmt_type == 'CashOut':
-            self.handle_cash_out()  
+            self.handle_cash_out() 
+
+        elif stmt_type == 'RepeatBlock':
+            self.handle_repeat(stmt) 
+
+        elif stmt_type == 'WhileBlock':
+            self.handle_while(stmt)        
             
     def handle_bankroll(self, stmt):
 
@@ -152,6 +161,20 @@ class Roulet:
 
         self.balance += total_win
 
+        self.round_profit = total_win
+
+        if total_win > 0:
+
+            self.consecutive_wins += 1
+            self.consecutive_losses = 0
+
+        else:
+
+            self.consecutive_losses += 1
+            self.consecutive_wins = 0
+
+        print(f"Ukupan dobitak: {total_win}")
+
         print(f"Ukupan dobitak: {total_win}")
 
         self.current_bets.clear()
@@ -163,6 +186,22 @@ class Roulet:
     def handle_cash_out(self):
 
         print(f"Cash out: {self.balance}")   
+
+    def handle_repeat(self, stmt):
+
+        for _ in range(stmt.times):
+
+            for inner_stmt in stmt.statements:
+
+                self.execute_statement(inner_stmt)
+
+    def handle_while(self, stmt):
+
+        while self.evaluate_condition(stmt.condition):
+
+            for inner_stmt in stmt.statements:
+
+                self.execute_statement(inner_stmt)            
 
     def calculate_payout(self, bet_type, amount, result):
 
@@ -264,7 +303,88 @@ class Roulet:
             if result in [0, 1, 2, 3]:
                 return amount * 7
 
-        return 0         
+        return 0   
+
+
+    def evaluate_condition(self, condition):
+
+        condition_type = condition.__class__.__name__
+
+    #compound condition
+        if condition_type == 'CompoundCondition':
+
+            left_result = self.evaluate_condition(condition.left)
+
+            right_result = self.evaluate_condition(condition.right)
+
+            if condition.logic_op == 'and':
+                return left_result and right_result
+
+            elif condition.logic_op == 'or':
+                return left_result or right_result
+
+    #balance condition
+        elif condition_type == 'BalanceCondition':
+
+            return self.compare(
+                self.balance,
+                condition.operator,
+                condition.amount
+            )
+
+    
+    #consecutive wins
+        elif condition_type == 'ConsecutiveWins':
+
+            return self.compare(
+                self.consecutive_wins,
+                condition.operator,
+                condition.count
+            )
+
+    
+    #consecutive losses
+        elif condition_type == 'ConsecutiveLosses':
+
+            return self.compare(
+                self.consecutive_losses,
+                condition.operator,
+                condition.count
+            )
+
+   
+    #round profit
+        elif condition_type == 'RoundProfitCondition':
+
+            return self.compare(
+                self.round_profit,
+                condition.operator,
+                condition.amount
+            )
+
+        return False
+
+    def compare(self, left, operator, right):
+
+        if operator == '>':
+            return left > right
+
+        elif operator == '<':
+            return left < right
+
+        elif operator == '>=':
+                return left >= right
+
+        elif operator == '<=':
+            return left <= right
+
+        elif operator == '==':
+            return left == right
+
+        elif operator == '!=':
+            return left != right
+
+        return False          
              
 
 def main(file_name_to_interpret):
