@@ -1,0 +1,28 @@
+{
+  "name": "roul-language",
+  "displayName": "Roul Language Support",
+  "description": "Syntax highlighting for .roul roulette strategy DSL files",
+  "version": "0.1.0",
+  "publisher": "nikola031ue",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "roul",
+        "aliases": ["Roul", "roul"],
+        "extensions": [".roul", ".rul"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "roul",
+        "scopeName": "source.roul",
+        "path": "./syntaxes/roul.tmLanguage.json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Roul",
+  "scopeName": "source.roul",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#keywords-control" },
+    { "include": "#keywords-commands" },
+    { "include": "#keywords-bet-types" },
+    { "include": "#keywords-conditions" },
+    { "include": "#keywords-logic" },
+    { "include": "#operators" },
+    { "include": "#numbers" },
+    { "include": "#identifiers" }
+  ],
+  "repository": {
+    "comments": {
+      "name": "comment.line.double-slash.roul",
+      "match": "//.*$"
+    },
+    "keywords-control": {
+      "name": "keyword.control.roul",
+      "match": "\\b(if_win|if_lose|if|else|while|repeat|break|continue|skip_round)\\b"
+    },
+    "keywords-commands": {
+      "name": "keyword.other.command.roul",
+      "match": "\\b(bankroll|round|strategy|spin|clear_bets|cash_out|double_bet|reset_bet|stop_on_win|stop_on_loss|show_stats|show_history|show_balance|bet)\\b"
+    },
+    "keywords-bet-types": {
+      "name": "support.type.bet.roul",
+      "match": "\\b(number|red|black|even|odd|low|high|dozen|column|split|street|corner|sixline|basket)\\b"
+    },
+    "keywords-conditions": {
+      "name": "variable.language.condition.roul",
+      "match": "\\b(balance|consecutive_wins|consecutive_losses|round_profit)\\b"
+    },
+    "keywords-logic": {
+      "name": "keyword.operator.logical.roul",
+      "match": "\\b(and|or)\\b"
+    },
+    "operators": {
+      "name": "keyword.operator.comparison.roul",
+      "match": "(>=|<=|==|!=|>|<)"
+    },
+    "numbers": {
+      "name": "constant.numeric.roul",
+      "match": "\\b[0-9]+\\b"
+    },
+    "identifiers": {
+      "name": "entity.name.strategy.roul",
+      "match": "(?<=strategy\\s)\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+    }
+  }
+}
