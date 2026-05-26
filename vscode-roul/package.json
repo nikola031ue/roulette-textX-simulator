@@ -1,13 +1,14 @@
 {
   "name": "roul-language",
   "displayName": "Roul Language Support",
-  "description": "Syntax highlighting for .roul roulette strategy DSL files",
-  "version": "0.1.0",
+  "description": "Syntax highlighting and LSP support for .roul roulette strategy DSL files",
+  "version": "0.2.0",
   "publisher": "nikola031ue",
   "engines": {
     "vscode": "^1.75.0"
   },
   "categories": ["Programming Languages"],
+  "main": "./extension.js",
   "contributes": {
     "languages": [
       {
@@ -24,5 +25,8 @@
         "path": "./syntaxes/roul.tmLanguage.json"
       }
     ]
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
   }
 }
