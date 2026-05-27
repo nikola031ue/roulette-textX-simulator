@@ -42,6 +42,42 @@ repeat 15 {
 cash_out
 ```
 
+# VS Code podrška (Syntax Highlighting + LSP)
+
+Ekstenzija za VS Code pruža syntax highlighting i Language Server Protocol (LSP) podršku za `.roul` fajlove — uključujući autocomplete i dijagnostiku grešaka u realnom vremenu.
+
+## Instalacija
+
+**1. Python zavisnosti:**
+```bash
+pip install pygls textx
+```
+
+**2. Node zavisnosti (jednom, u `vscode-roul/` folderu):**
+```bash
+cd vscode-roul
+npm install
+```
+
+**3. Instalacija ekstenzije u VS Code:**
+```bash
+# Windows
+xcopy /E /I /Y vscode-roul "%USERPROFILE%\.vscode\extensions\roul-language-0.2.0"
+
+# Linux/Mac
+cp -r vscode-roul ~/.vscode/extensions/roul-language-0.2.0
+```
+
+**4. Restartuj VS Code** (`Ctrl+Shift+P` → `Developer: Reload Window`)
+
+## Rezultat
+
+- **Syntax highlighting** — bojenje ključnih reči, tipova opklada, uslova i komentara
+- **Autocomplete** — `Ctrl+Space` predlaže sve DSL komande
+- **Dijagnostika** — greške se podvlače crveno odmah pri kucanju
+
+---
+
 # Validacija i Vizualizacija Gramatike
 
 ## Provera ispravnosti textX gramatike
