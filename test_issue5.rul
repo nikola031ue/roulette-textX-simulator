@@ -1,0 +1,74 @@
+// Test fajl za Issue-5: if_win / if_lose / if (condition) / else
+
+bankroll 1000
+
+// Test 1: if_win - ako dobijemo, udvostruci ulog
+bet red 50
+spin
+if_win {
+    show_balance
+}
+
+// Test 2: if_lose - ako izgubimo, udvostruci ulog (martingale princip)
+bet black 50
+spin
+if_lose {
+    bet black 100
+    spin
+}
+
+// Test 3: if (condition) - provera balansa
+if (balance > 500) {
+    show_balance
+}
+
+// Test 4: if sa else delom
+if (balance < 500) {
+    bet red 200
+} else {
+    bet red 100
+}
+spin
+
+// Test 5: if_win sa else
+bet even 50
+spin
+if_win {
+    show_balance
+} else {
+    show_balance
+}
+
+// Test 6: if_lose sa else
+bet odd 50
+spin
+if_lose {
+    show_balance
+} else {
+    show_balance
+}
+
+// Test 7: Ugnjezdeni if_win unutar repeat bloka
+repeat 3 {
+    bet red 20
+    spin
+    if_win {
+        show_balance
+    }
+}
+
+// Test 8: if sa compound condition (and/or)
+bet red 30
+spin
+if (balance >= 800 and consecutive_wins >= 1) {
+    show_balance
+}
+
+// Test 9: if sa round_profit condition
+bet red 40
+spin
+if (round_profit > 0) {
+    show_balance
+}
+
+cash_out

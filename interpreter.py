@@ -17,6 +17,8 @@ class Roulet:
         self.consecutive_wins = 0
         self.consecutive_losses = 0
         self.round_profit = 0
+        self.last_spin_won = False
+
     def is_model_semantically_valid(self, model):
 
         for stmt in model.statements:
@@ -58,9 +60,14 @@ class Roulet:
 
     def validate_dozen_column(self, bet_type):
 
-        if bet_type.__class__.__name__ in ['DozenBet', 'ColumnBet']:
-            if not (1 <= bet_type.value <= 3):
-                print(f"Greska: mora biti izmedju  1 i 3, unet je broj {bet_type.value}")
+        if bet_type.__class__.__name__ == 'DozenBet':
+            if not (1 <= bet_type.dozen <= 3):
+                print(f"Greska: dozen mora biti izmedju 1 i 3, unet je broj {bet_type.dozen}")
+                return False
+
+        elif bet_type.__class__.__name__ == 'ColumnBet':
+            if not (1 <= bet_type.column <= 3):
+                print(f"Greska: column mora biti izmedju 1 i 3, unet je broj {bet_type.column}")
                 return False
 
         return True
@@ -88,6 +95,7 @@ class Roulet:
                 return False
 
         return True 
+
     def interpret(self, model):
 
         for stmt in model.statements:
@@ -116,7 +124,16 @@ class Roulet:
             self.handle_repeat(stmt) 
 
         elif stmt_type == 'WhileBlock':
-            self.handle_while(stmt)        
+            self.handle_while(stmt)
+
+        elif stmt_type == 'IfWin':
+            self.handle_if_win(stmt)
+
+        elif stmt_type == 'IfLose':
+            self.handle_if_lose(stmt)
+
+        elif stmt_type == 'ConditionalIfBlock':
+            self.handle_conditional_if(stmt)        
             
     def handle_bankroll(self, stmt):
 
@@ -164,16 +181,14 @@ class Roulet:
         self.round_profit = total_win
 
         if total_win > 0:
-
+            self.last_spin_won = True
             self.consecutive_wins += 1
             self.consecutive_losses = 0
 
         else:
-
+            self.last_spin_won = False
             self.consecutive_losses += 1
             self.consecutive_wins = 0
-
-        print(f"Ukupan dobitak: {total_win}")
 
         print(f"Ukupan dobitak: {total_win}")
 
@@ -201,6 +216,30 @@ class Roulet:
 
             for inner_stmt in stmt.statements:
 
+                self.execute_statement(inner_stmt)
+
+    def handle_if_win(self, stmt):
+        if self.last_spin_won:
+            for inner_stmt in stmt.statements:
+                self.execute_statement(inner_stmt)
+        elif stmt.else_part:
+            for inner_stmt in stmt.else_part.statements:
+                self.execute_statement(inner_stmt)
+
+    def handle_if_lose(self, stmt):
+        if not self.last_spin_won:
+            for inner_stmt in stmt.statements:
+                self.execute_statement(inner_stmt)
+        elif stmt.else_part:
+            for inner_stmt in stmt.else_part.statements:
+                self.execute_statement(inner_stmt)
+
+    def handle_conditional_if(self, stmt):
+        if self.evaluate_condition(stmt.condition):
+            for inner_stmt in stmt.statements:
+                self.execute_statement(inner_stmt)
+        elif stmt.else_part:
+            for inner_stmt in stmt.else_part.statements:
                 self.execute_statement(inner_stmt)            
 
     def calculate_payout(self, bet_type, amount, result):
@@ -400,4 +439,4 @@ def main(file_name_to_interpret):
         
 
 if __name__ == "__main__":
-    main("ruletPrimer.rul")    
+    main("test_issue5.rul")
