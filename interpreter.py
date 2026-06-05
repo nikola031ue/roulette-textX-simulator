@@ -18,6 +18,8 @@ class Roulet:
         self.consecutive_losses = 0
         self.round_profit = 0
         self.last_spin_won = False
+        self._break = False
+        self._skip_round = False
 
     def is_model_semantically_valid(self, model):
 
@@ -133,7 +135,16 @@ class Roulet:
             self.handle_if_lose(stmt)
 
         elif stmt_type == 'ConditionalIfBlock':
-            self.handle_conditional_if(stmt)        
+            self.handle_conditional_if(stmt)
+
+        elif stmt_type == 'BreakCommand':
+            self._break = True
+
+        elif stmt_type == 'SkipRoundCommand':
+            self._skip_round = True
+
+        elif stmt_type == 'Round':
+            self.handle_round(stmt)
             
     def handle_bankroll(self, stmt):
 
@@ -205,18 +216,24 @@ class Roulet:
     def handle_repeat(self, stmt):
 
         for _ in range(stmt.times):
-
+            if self._break:
+                break
             for inner_stmt in stmt.statements:
-
                 self.execute_statement(inner_stmt)
+                if self._break:
+                    break
+        self._break = False
 
     def handle_while(self, stmt):
 
         while self.evaluate_condition(stmt.condition):
-
+            if self._break:
+                break
             for inner_stmt in stmt.statements:
-
                 self.execute_statement(inner_stmt)
+                if self._break:
+                    break
+        self._break = False
 
     def handle_if_win(self, stmt):
         if self.last_spin_won:
@@ -240,7 +257,15 @@ class Roulet:
                 self.execute_statement(inner_stmt)
         elif stmt.else_part:
             for inner_stmt in stmt.else_part.statements:
-                self.execute_statement(inner_stmt)            
+                self.execute_statement(inner_stmt)
+
+    def handle_round(self, stmt):
+        self.round_profit = 0
+        self._skip_round = False
+        for inner_stmt in stmt.statements:
+            if self._skip_round:
+                break
+            self.execute_statement(inner_stmt)
 
     def calculate_payout(self, bet_type, amount, result):
 
@@ -439,4 +464,4 @@ def main(file_name_to_interpret):
         
 
 if __name__ == "__main__":
-    main("test_issue5.rul")
+    main("test_issue6.rul")
