@@ -25,6 +25,10 @@ class Roulet:
         self.net_profit = 0
         self.history = []
 
+        self._break = False
+        self._skip_round = False
+
+
     def is_model_semantically_valid(self, model):
 
         for stmt in model.statements:
@@ -142,10 +146,26 @@ class Roulet:
             self.handle_if_lose(stmt)
 
         elif stmt_type == 'ConditionalIfBlock':
+
             self.handle_conditional_if(stmt)        
 
+        elif stmt_type == 'BreakCommand':
+            self._break = True
+
+        elif stmt_type == 'SkipRoundCommand':
+            self._skip_round = True
+
+        elif stmt_type == 'Round':
+            self.handle_round(stmt)
+            
+    def handle_bankroll(self, stmt):
+
+        self.balance = stmt.amount
+
+        print(f"Balance postavljen na {self.balance}")
+
     def handle_show_stats(self):
-            win_rate = 0
+        win_rate = 0
         if self.total_spins > 0:
             win_rate = (self.total_wins / self.total_spins) * 100
 
@@ -155,13 +175,6 @@ class Roulet:
         print(f"Net profit: {self.net_profit}")
         print(f"Biggest win: {self.biggest_win}")
         print(f"Biggest loss: {self.biggest_loss}")
-
-
-    def handle_bankroll(self, stmt):
-
-        self.balance = stmt.amount
-
-        print(f"Balance postavljen na {self.balance}")
 
     def handle_bet(self, stmt):
 
@@ -182,11 +195,11 @@ class Roulet:
 
     def handle_spin(self):
 
-            result = random.randint(0, 36)
+        result = random.randint(0, 36)
 
-    self.total_spins += 1
+        self.total_spins += 1
 
-    print(f"Spin rezultat: {result}")
+        print(f"Spin rezultat: {result}")
 
         total_win = 0
         total_bet = 0
@@ -203,23 +216,18 @@ class Roulet:
 
             total_win += payout
 
-        
         self.balance += (total_win - total_bet)
 
-        
         spin_profit = total_win - total_bet
 
-        
         self.net_profit += spin_profit
 
-        
         if spin_profit > self.biggest_win:
             self.biggest_win = spin_profit
 
         if spin_profit < self.biggest_loss:
             self.biggest_loss = spin_profit
 
-        
         if spin_profit > 0:
             self.total_wins += 1
             self.last_spin_won = True
@@ -234,11 +242,12 @@ class Roulet:
 
         print(f"Ukupan dobitak: {total_win}")
         print(f"Profit spin-a: {spin_profit}")
+
         self.history.append({
             "result": result,
             "profit": spin_profit,
             "balance": self.balance
-                })
+        })
 
         self.current_bets.clear()
 
@@ -253,18 +262,24 @@ class Roulet:
     def handle_repeat(self, stmt):
 
         for _ in range(stmt.times):
-
+            if self._break:
+                break
             for inner_stmt in stmt.statements:
-
                 self.execute_statement(inner_stmt)
+                if self._break:
+                    break
+        self._break = False
 
     def handle_while(self, stmt):
 
         while self.evaluate_condition(stmt.condition):
-
+            if self._break:
+                break
             for inner_stmt in stmt.statements:
-
                 self.execute_statement(inner_stmt)
+                if self._break:
+                    break
+        self._break = False
 
     def handle_if_win(self, stmt):
         if self.last_spin_won:
@@ -288,7 +303,15 @@ class Roulet:
                 self.execute_statement(inner_stmt)
         elif stmt.else_part:
             for inner_stmt in stmt.else_part.statements:
-                self.execute_statement(inner_stmt)            
+                self.execute_statement(inner_stmt)
+
+    def handle_round(self, stmt):
+        self.round_profit = 0
+        self._skip_round = False
+        for inner_stmt in stmt.statements:
+            if self._skip_round:
+                break
+            self.execute_statement(inner_stmt)
 
     def calculate_payout(self, bet_type, amount, result):
 
@@ -473,7 +496,7 @@ class Roulet:
 
         return False          
 
-    def          
+             
 
 def main(file_name_to_interpret):
 
@@ -488,4 +511,4 @@ def main(file_name_to_interpret):
         
 
 if __name__ == "__main__":
-    main("test_issue5.rul")
+    main("test_issue6.rul")

@@ -1,0 +1,57 @@
+// Test fajl za Issue-6: flow control (break, skip_round)
+
+bankroll 1000
+
+// Test 1: break unutar repeat bloka
+repeat 10 {
+    bet red 50
+    spin
+    if_win {
+        break
+    }
+}
+
+show_balance
+
+// Test 2: skip_round unutar round bloka
+round {
+    bet black 100
+    spin
+    if_lose {
+        skip_round
+    }
+    show_balance
+    bet red 50
+    spin
+}
+
+show_balance
+
+// Test 3: break unutar while petlje
+bankroll 500
+
+while(balance > 0) {
+    bet red 20
+    spin
+    if (balance < 400) {
+        break
+    }
+}
+
+show_balance
+
+// Test 4: Ugnjezdeni break (break iz unutrasnjeg repeat-a)
+repeat 5 {
+    bet red 30
+    spin
+    repeat 3 {
+        bet black 10
+        spin
+        if_win {
+            break
+        }
+    }
+    show_balance
+}
+
+cash_out
