@@ -1,0 +1,57 @@
+// Test fajl za Issue-7: ControlCommand (double_bet, reset_bet, stop_on_win, stop_on_loss)
+// ControlCommand moze SAMO direktno unutar round bloka (ne u if_win/if_lose unutar round-a)
+
+bankroll 1000
+
+// Test 1: double_bet unutar round bloka
+round {
+    bet red 50
+    double_bet
+    spin
+}
+
+show_balance
+
+// Test 2: reset_bet unutar round bloka
+round {
+    bet black 100
+    reset_bet
+    spin
+}
+
+show_balance
+
+// Test 3: stop_on_win unutar round bloka
+bankroll 500
+
+round {
+    bet red 20
+    spin
+    stop_on_win 600
+}
+
+show_balance
+
+// Test 4: stop_on_loss unutar round bloka
+bankroll 500
+
+round {
+    bet black 30
+    spin
+    stop_on_loss 200
+}
+
+show_balance
+
+// Test 5: Kombinovana strategija
+bankroll 1000
+
+round {
+    bet red 50
+    double_bet
+    spin
+    stop_on_win 1500
+    stop_on_loss 500
+}
+
+cash_out
