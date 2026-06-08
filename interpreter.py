@@ -18,8 +18,16 @@ class Roulet:
         self.consecutive_losses = 0
         self.round_profit = 0
         self.last_spin_won = False
+        self.total_spins = 0
+        self.total_wins = 0
+        self.biggest_win = 0
+        self.biggest_loss = float("inf")
+        self.net_profit = 0
+        self.history = []
+
         self._break = False
         self._skip_round = False
+
 
     def is_model_semantically_valid(self, model):
 
@@ -119,6 +127,9 @@ class Roulet:
         elif stmt_type == 'ShowBalance':
             self.handle_show_balance()
 
+        elif stmt_type == 'ShowStats' :
+             self.handle_show_stats()   
+
         elif stmt_type == 'CashOut':
             self.handle_cash_out() 
 
@@ -135,7 +146,8 @@ class Roulet:
             self.handle_if_lose(stmt)
 
         elif stmt_type == 'ConditionalIfBlock':
-            self.handle_conditional_if(stmt)
+
+            self.handle_conditional_if(stmt)        
 
         elif stmt_type == 'BreakCommand':
             self._break = True
@@ -151,6 +163,18 @@ class Roulet:
         self.balance = stmt.amount
 
         print(f"Balance postavljen na {self.balance}")
+
+    def handle_show_stats(self):
+        win_rate = 0
+        if self.total_spins > 0:
+            win_rate = (self.total_wins / self.total_spins) * 100
+
+        print("\n--- STATS ---")
+        print(f"Total spins: {self.total_spins}")
+        print(f"Win rate: {win_rate:.2f}%")
+        print(f"Net profit: {self.net_profit}")
+        print(f"Biggest win: {self.biggest_win}")
+        print(f"Biggest loss: {self.biggest_loss}")
 
     def handle_bet(self, stmt):
 
@@ -173,11 +197,16 @@ class Roulet:
 
         result = random.randint(0, 36)
 
+        self.total_spins += 1
+
         print(f"Spin rezultat: {result}")
 
         total_win = 0
+        total_bet = 0
 
         for bet in self.current_bets:
+
+            total_bet += bet["amount"]
 
             payout = self.calculate_payout(
                 bet["bet_type"],
@@ -187,21 +216,38 @@ class Roulet:
 
             total_win += payout
 
-        self.balance += total_win
+        self.balance += (total_win - total_bet)
 
-        self.round_profit = total_win
+        spin_profit = total_win - total_bet
 
-        if total_win > 0:
+        self.net_profit += spin_profit
+
+        if spin_profit > self.biggest_win:
+            self.biggest_win = spin_profit
+
+        if spin_profit < self.biggest_loss:
+            self.biggest_loss = spin_profit
+
+        if spin_profit > 0:
+            self.total_wins += 1
             self.last_spin_won = True
             self.consecutive_wins += 1
             self.consecutive_losses = 0
-
         else:
             self.last_spin_won = False
             self.consecutive_losses += 1
             self.consecutive_wins = 0
 
+        self.round_profit = spin_profit
+
         print(f"Ukupan dobitak: {total_win}")
+        print(f"Profit spin-a: {spin_profit}")
+
+        self.history.append({
+            "result": result,
+            "profit": spin_profit,
+            "balance": self.balance
+        })
 
         self.current_bets.clear()
 
@@ -449,6 +495,7 @@ class Roulet:
             return left != right
 
         return False          
+
              
 
 def main(file_name_to_interpret):
