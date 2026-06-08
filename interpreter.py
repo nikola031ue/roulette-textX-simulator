@@ -4,6 +4,7 @@ from textx import metamodel_from_file
 import base64
 import json
 import random
+from database import init_db, save_strategy
 
 RED_NUMBERS = {
     1,3,5,7,9,12,14,16,18,
@@ -24,9 +25,11 @@ class Roulet:
         self.biggest_loss = float("inf")
         self.net_profit = 0
         self.history = []
-
+        self.starting_bankroll = 0
         self._break = False
         self._skip_round = False
+        self.peak_balance = 0
+        self.max_drawdown = 0
 
 
     def is_model_semantically_valid(self, model):
@@ -161,7 +164,8 @@ class Roulet:
     def handle_bankroll(self, stmt):
 
         self.balance = stmt.amount
-
+        self.starting_bankroll = stmt.amount
+        self.peak_balance = stmt.amount
         print(f"Balance postavljen na {self.balance}")
 
     def handle_show_stats(self):
@@ -239,6 +243,13 @@ class Roulet:
             self.consecutive_wins = 0
 
         self.round_profit = spin_profit
+        if self.balance > self.peak_balance:
+            self.peak_balance = self.balance
+
+        drawdown = self.peak_balance - self.balance
+
+        if drawdown > self.max_drawdown:
+            self.max_drawdown = drawdown
 
         print(f"Ukupan dobitak: {total_win}")
         print(f"Profit spin-a: {spin_profit}")
@@ -257,7 +268,20 @@ class Roulet:
 
     def handle_cash_out(self):
 
-        print(f"Cash out: {self.balance}")   
+        print(f"Cash out: {self.balance}")
+        win_rate = (self.total_wins / self.total_spins) * 100 if self.total_spins else 0
+
+        data = {
+        "name": "default_strategy",
+        "starting_bankroll": self.starting_bankroll,
+        "ending_bankroll": self.balance,
+        "number_of_spins": self.total_spins,
+        "win_rate": win_rate,
+        "max_drawdown": self.max_drawdown,
+        "net_profit": self.balance - self.starting_bankroll
+        }
+
+        save_strategy(data)   
 
     def handle_repeat(self, stmt):
 
@@ -504,6 +528,7 @@ def main(file_name_to_interpret):
 
     rulet_mm = metamodel_from_file(join(this_folder, 'grammar.tx'), debug=False)
     rulet_model = rulet_mm.model_from_file(file_name_to_interpret)
+    init_db()
     roulet = Roulet()
     if roulet.is_model_semantically_valid(rulet_model):
         roulet.interpret(rulet_model)
