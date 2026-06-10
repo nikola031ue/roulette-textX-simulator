@@ -11,6 +11,10 @@ RED_NUMBERS = {
     19,21,23,25,27,30,32,34,36
 }
 
+class StopGame(Exception):
+    """Izuzetak za zaustavljanje igre na cash_out i stop_on_win/loss"""
+    pass
+
 class Roulet:
     def __init__(self):
         self.balance = 0
@@ -30,6 +34,8 @@ class Roulet:
         self._skip_round = False
         self.peak_balance = 0
         self.max_drawdown = 0
+        self.last_bet_amount = 0
+        self.initial_bet_amount = 0
 
 
     def is_model_semantically_valid(self, model):
@@ -110,9 +116,11 @@ class Roulet:
         return True 
 
     def interpret(self, model):
-
-        for stmt in model.statements:
-            self.execute_statement(stmt)
+        try:
+            for stmt in model.statements:
+                self.execute_statement(stmt)
+        except StopGame:
+            pass
 
     def execute_statement(self, stmt):
 
@@ -160,6 +168,18 @@ class Roulet:
 
         elif stmt_type == 'Round':
             self.handle_round(stmt)
+
+        elif stmt_type == 'DoubleBet':
+            self.handle_double_bet()
+
+        elif stmt_type == 'ResetBet':
+            self.handle_reset_bet()
+
+        elif stmt_type == 'StopOnWin':
+            self.handle_stop_on_win(stmt)
+
+        elif stmt_type == 'StopOnLoss':
+            self.handle_stop_on_loss(stmt)
             
     def handle_bankroll(self, stmt):
 
@@ -195,6 +215,10 @@ class Roulet:
             "amount": amount
         })
 
+        self.last_bet_amount = amount
+        if self.initial_bet_amount == 0 and amount > 0:
+            self.initial_bet_amount = amount
+
         print(f"Bet dodat: {amount}")
 
     def handle_spin(self):
@@ -220,7 +244,7 @@ class Roulet:
 
             total_win += payout
 
-        self.balance += (total_win - total_bet)
+        self.balance += total_win
 
         spin_profit = total_win - total_bet
 
@@ -281,7 +305,8 @@ class Roulet:
         "net_profit": self.balance - self.starting_bankroll
         }
 
-        save_strategy(data)   
+        save_strategy(data)
+        raise StopGame()
 
     def handle_repeat(self, stmt):
 
@@ -336,6 +361,61 @@ class Roulet:
             if self._skip_round:
                 break
             self.execute_statement(inner_stmt)
+
+    def handle_double_bet(self):
+        if not self.current_bets:
+            print("Nema aktivnih opklada za dupli ulog")
+            return
+
+        #da li ima dovoljno novca za sve opklade?
+        total_additional = sum(bet["amount"] for bet in self.current_bets)
+        if self.balance < total_additional:
+            print("Nema dovoljno novca za duplu ulog")
+            return
+
+        self.balance -= total_additional
+        for bet in self.current_bets:
+            bet["amount"] *= 2
+        self.last_bet_amount *= 2
+        print(f"Dupli ulog: Ulog je udvostrucen na {self.last_bet_amount}")
+
+    def handle_reset_bet(self):
+        if not self.current_bets:
+            return
+        #prvo izracunaj ukupnu razliku i proveri
+        total_needed = 0
+        total_refund = 0
+        for bet in self.current_bets:
+            current = bet["amount"]
+            target = self.initial_bet_amount
+            if current < target:
+                total_needed += (target - current)
+            elif current > target:
+                total_refund += (current - target)
+
+        net_needed = total_needed - total_refund
+        if net_needed > 0 and self.balance < net_needed:
+            return
+
+        if net_needed > 0:
+            self.balance -= net_needed
+        elif net_needed < 0:
+            self.balance += abs(net_needed)
+
+        for bet in self.current_bets:
+            bet["amount"] = self.initial_bet_amount
+        self.last_bet_amount = self.initial_bet_amount
+        print(f"Reset bet: Ulog vracen na {self.last_bet_amount}")
+
+    def handle_stop_on_win(self, stmt):
+        if self.balance >= stmt.amount:
+            print(f"Stop on win: dostignut {stmt.amount}!")
+            raise StopGame()
+
+    def handle_stop_on_loss(self, stmt):
+        if self.balance <= self.starting_bankroll - stmt.amount:
+            print(f"Stop on loss: izgubljeno {stmt.amount}!")
+            raise StopGame()
 
     def calculate_payout(self, bet_type, amount, result):
 
@@ -536,4 +616,4 @@ def main(file_name_to_interpret):
         
 
 if __name__ == "__main__":
-    main("test_issue6.rul")
+    main("test_issue7.rul")
