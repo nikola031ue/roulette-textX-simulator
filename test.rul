@@ -1,0 +1,60 @@
+// Test fajl za Rulet DSL
+// Testira osnovne funkcionalnosti pre implementacije issue-5
+
+bankroll 1000
+
+// Test 1: Jednostavna opklada na crveno
+bet red 50
+spin
+
+show_balance
+
+// Test 2: Opklada na konkretan broj
+bet number 17 25
+spin
+
+show_balance
+
+// Test 3: Opklada na parnost
+bet even 30
+spin
+
+show_balance
+
+// Test 4: Opklada na opseg (high)
+bet high 40
+spin
+
+show_balance
+
+// Test 5: Opklada na desetinu (dozen)
+bet dozen 2 60
+spin
+
+show_balance
+
+// Test 6: Opklada na kolonu
+bet column 3 35
+spin
+
+show_balance
+
+// Test 7: Repeat blok - ponavlja 3 puta
+repeat 3 {
+    bet black 20
+    spin
+    show_balance
+}
+
+// Test 8: While blok - igraj dok ima novca (ali zaustavi se nakon nekoliko spinova zbog testa)
+// Napomena: while ce se vrteti dok god je balance > 0, pa pazi da ne uleti u beskonacnu petlju
+// Zato cemo staviti manji ulog da duze traje
+bankroll 200
+
+while(balance > 0) {
+    bet red 10
+    spin
+}
+
+show_balance
+cash_out

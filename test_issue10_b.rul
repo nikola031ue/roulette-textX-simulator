@@ -1,0 +1,17 @@
+// Test fajl za Issue-10: Druga strategija za testiranje ranking-a
+
+bankroll 1000
+
+// Agresivnija strategija: opklada na broj
+bet number 17 100
+spin
+
+bet number 17 100
+spin
+
+bet number 17 100
+spin
+
+show_balance
+
+cash_out

@@ -1,0 +1,20 @@
+// Test fajl za Issue-10: Ranking strategija
+// Nakon zavrsetka igre, prikazuje se rangiranje u odnosu na prethodne strategije
+
+bankroll 1000
+
+// Jednostavna strategija: opklada na crveno
+bet red 50
+spin
+
+bet red 50
+spin
+
+bet red 50
+spin
+
+show_balance
+show_stats
+show_history
+
+cash_out
