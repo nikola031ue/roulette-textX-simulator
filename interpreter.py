@@ -1,10 +1,13 @@
 import json
 from os.path import join, dirname
+from unittest import result
+
 from textx import metamodel_from_file
 import base64
 import json
 import random
-from database import init_db, save_strategy
+from database import init_db, save_strategy, calculate_score, get_ranking
+from simulator import spin_wheel
 
 RED_NUMBERS = {
     1,3,5,7,9,12,14,16,18,
@@ -16,7 +19,7 @@ class StopGame(Exception):
     pass
 
 class Roulet:
-    def __init__(self):
+    def __init__(self, seed=None):
         self.balance = 0
         self.current_bets = []
         self.consecutive_wins = 0
@@ -36,7 +39,8 @@ class Roulet:
         self.max_drawdown = 0
         self.last_bet_amount = 0
         self.initial_bet_amount = 0
-
+        self.seed = seed
+        self.spin_counter = 0
 
     def is_model_semantically_valid(self, model):
 
@@ -115,12 +119,94 @@ class Roulet:
 
         return True 
 
-    def interpret(self, model):
+    def run(self, model, strategy_name="unnamed", save_to_db=True, num_seeds=10):
         try:
-            for stmt in model.statements:
-                self.execute_statement(stmt)
+            self.interpret(model)
         except StopGame:
             pass
+
+        stats = self._compute_stats()
+
+        if save_to_db and self.starting_bankroll > 0:
+            seed_results = self._evaluate_multiple_seeds(model, num_seeds)
+            avg_stats = self._compute_avg_stats(seed_results)
+            score = save_strategy(strategy_name, self.starting_bankroll, stats, seed_results, score_value=calculate_score(avg_stats))
+            rank, total, all_strategies = get_ranking(score)
+            self._print_ranking(rank, total, score, all_strategies, strategy_name)
+
+        return stats
+
+    def _compute_stats(self):
+        total_spins = self.total_spins
+        net_profit = self.balance - self.starting_bankroll
+        win_rate = (self.total_wins / total_spins * 100) if total_spins > 0 else 0
+        avg_profit = net_profit / total_spins if total_spins > 0 else 0
+        losses = total_spins - self.total_wins
+        return {
+            'final_bankroll': self.balance,
+            'net_profit': net_profit,
+            'total_spins': total_spins,
+            'wins': self.total_wins,
+            'losses': losses,
+            'win_rate': win_rate,
+            'max_drawdown': self.max_drawdown,
+            'avg_profit_per_spin': avg_profit,
+        }
+
+    def _evaluate_multiple_seeds(self, model, num_seeds):
+        results = []
+        for s in range(num_seeds):
+            roulet = Roulet(seed=s)
+            try:
+                roulet.interpret(model)
+            except StopGame:
+                pass
+            results.append({
+                'seed': s,
+                **roulet._compute_stats()
+            })
+        return results
+
+    def _compute_avg_stats(self, seed_results):
+        """Racuna prosecnu statistiku iz rezultata vise seed-ova."""
+        if not seed_results:
+            return self._compute_stats()
+
+        n = len(seed_results)
+        avg_net_profit = sum(r['net_profit'] for r in seed_results) / n
+        avg_total_spins = sum(r['total_spins'] for r in seed_results) / n
+        avg_max_drawdown = sum(r['max_drawdown'] for r in seed_results) / n
+        avg_win_rate = sum(r['win_rate'] for r in seed_results) / n
+        avg_final_bankroll = sum(r['final_bankroll'] for r in seed_results) / n
+        avg_wins = sum(r['wins'] for r in seed_results) / n
+        avg_losses = sum(r['losses'] for r in seed_results) / n
+        avg_profit_per_spin = avg_net_profit / max(1, avg_total_spins)
+
+        return {
+            'final_bankroll': int(avg_final_bankroll),
+            'net_profit': int(avg_net_profit),
+            'total_spins': int(avg_total_spins),
+            'wins': int(avg_wins),
+            'losses': int(avg_losses),
+            'win_rate': round(avg_win_rate, 2),
+            'max_drawdown': int(avg_max_drawdown),
+            'avg_profit_per_spin': round(avg_profit_per_spin, 4),
+        }
+
+    def _print_ranking(self, rank, total, score, all_strategies, strategy_name):
+        print("\n" + "=" * 50)
+        print(f"  RANGIRANJE STRATEGIJE")
+        print("=" * 50)
+        print(f"  Tvoj rank: #{rank} od {total} strategija")
+        print(f"  Tvoj score: {score:.4f}")
+        print("\n  Top 5 strategija:")
+        for i, s in enumerate(all_strategies[:5], 1):
+            print(f"  {i}. {s['name']} | score: {s['score']:.4f} | profit: {s['net_profit']}")
+        print("=" * 50 + "\n")
+
+    def interpret(self, model):
+        for stmt in model.statements:
+            self.execute_statement(stmt)
 
     def execute_statement(self, stmt):
 
@@ -139,10 +225,16 @@ class Roulet:
             self.handle_show_balance()
 
         elif stmt_type == 'ShowStats' :
-             self.handle_show_stats()   
+            self.handle_show_stats()
+
+        elif stmt_type == 'ShowHistory':
+            self.handle_show_history()
 
         elif stmt_type == 'CashOut':
-            self.handle_cash_out() 
+            self.handle_cash_out()
+
+        elif stmt_type == 'ClearBets':
+            self.handle_clear_bets()
 
         elif stmt_type == 'RepeatBlock':
             self.handle_repeat(stmt) 
@@ -157,7 +249,6 @@ class Roulet:
             self.handle_if_lose(stmt)
 
         elif stmt_type == 'ConditionalIfBlock':
-
             self.handle_conditional_if(stmt)        
 
         elif stmt_type == 'BreakCommand':
@@ -168,6 +259,9 @@ class Roulet:
 
         elif stmt_type == 'Round':
             self.handle_round(stmt)
+
+        elif stmt_type == 'Strategy':
+            self.handle_strategy(stmt)
 
         elif stmt_type == 'DoubleBet':
             self.handle_double_bet()
@@ -200,6 +294,20 @@ class Roulet:
         print(f"Biggest win: {self.biggest_win}")
         print(f"Biggest loss: {self.biggest_loss}")
 
+    def handle_show_history(self):
+        print("\n--- ISTORIJA SPINOVA ---")
+        for i, entry in enumerate(self.history, 1):
+            print(f"  #{i:3d}: broj={entry['result']:2d} | profit={entry['profit']:+d}")
+        print("------------------------\n")
+
+    def handle_clear_bets(self):
+        self.current_bets.clear()
+        print("Opklade obrisane")
+
+    def handle_strategy(self, stmt):
+        for inner_stmt in stmt.statements:
+            self.execute_statement(inner_stmt)
+
     def handle_bet(self, stmt):
 
         amount = stmt.amount
@@ -223,7 +331,11 @@ class Roulet:
 
     def handle_spin(self):
 
-        result = random.randint(0, 36)
+        seed = None
+        if self.seed is not None:
+            seed = self.seed + self.spin_counter
+        result = spin_wheel(seed)
+        self.spin_counter += 1
 
         self.total_spins += 1
 
@@ -293,19 +405,6 @@ class Roulet:
     def handle_cash_out(self):
 
         print(f"Cash out: {self.balance}")
-        win_rate = (self.total_wins / self.total_spins) * 100 if self.total_spins else 0
-
-        data = {
-        "name": "default_strategy",
-        "starting_bankroll": self.starting_bankroll,
-        "ending_bankroll": self.balance,
-        "number_of_spins": self.total_spins,
-        "win_rate": win_rate,
-        "max_drawdown": self.max_drawdown,
-        "net_profit": self.balance - self.starting_bankroll
-        }
-
-        save_strategy(data)
         raise StopGame()
 
     def handle_repeat(self, stmt):
@@ -602,18 +701,19 @@ class Roulet:
 
              
 
-def main(file_name_to_interpret):
+def main(file_name_to_interpret, seed=None, num_seeds=10, save_to_db=True):
 
     this_folder = dirname(__file__)
 
     rulet_mm = metamodel_from_file(join(this_folder, 'grammar.tx'), debug=False)
     rulet_model = rulet_mm.model_from_file(file_name_to_interpret)
     init_db()
-    roulet = Roulet()
+    roulet = Roulet(seed=seed)
     if roulet.is_model_semantically_valid(rulet_model):
-        roulet.interpret(rulet_model)
+        strategy_name = file_name_to_interpret.split('.')[0]
+        roulet.run(rulet_model, strategy_name=strategy_name, save_to_db=save_to_db, num_seeds=num_seeds)
         
-        
+
 
 if __name__ == "__main__":
     main("test_issue7.rul")
