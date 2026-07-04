@@ -6,8 +6,8 @@ from textx import metamodel_from_file
 import base64
 import json
 import random
-from database import init_db, save_strategy, calculate_score, get_ranking
-from simulator import spin_wheel
+from roulette.database import init_db, save_strategy, calculate_score, get_ranking
+from roulette.simulator import spin_wheel
 
 RED_NUMBERS = {
     1,3,5,7,9,12,14,16,18,

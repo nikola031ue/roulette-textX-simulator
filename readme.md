@@ -42,6 +42,19 @@ repeat 15 {
 cash_out
 ```
 
+# Instalacija i pokretanje
+
+```bash
+pip install .
+# ili direktno sa GitHub-a
+pip install git+https://github.com/nikola031ue/roulette-textX-simulator.git
+```
+
+Nakon instalacije, dostupna je `roulette` CLI komanda:
+```bash
+roulette putanja/do/strategije.rul --seed 42 --num-seeds 20
+```
+
 # VS Code podrška (Syntax Highlighting + LSP)
 
 Ekstenzija za VS Code pruža syntax highlighting i Language Server Protocol (LSP) podršku za `.roul` fajlove — uključujući autocomplete i dijagnostiku grešaka u realnom vremenu.
@@ -83,7 +96,7 @@ cp -r vscode-roul ~/.vscode/extensions/roul-language-0.2.0
 ## Provera ispravnosti textX gramatike
 Da biste proverili da li je `grammar.tx` fajl sintaksno ispravan, koristite textX komandu:
 ```bash
-textx check grammar.tx
+textx check roulette/grammar.tx
 ```
 
 ## Generisanje PNG vizualizacije gramatike
@@ -91,7 +104,7 @@ Za vizualizaciju strukture gramatike, potrebno je generisati DOT fajl i konverto
 
 1. **Generisanje DOT fajla iz textX gramatike:**
 ```bash
-textx generate grammar.tx --target dot
+textx generate roulette/grammar.tx --target dot
 ```
 Ova komanda generiše `grammar.dot` fajl koji opisuje strukturu gramatike.
 
