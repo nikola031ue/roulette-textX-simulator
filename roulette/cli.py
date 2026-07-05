@@ -4,8 +4,8 @@ import sys
 
 from textx import metamodel_from_file
 
-from database import init_db
-from interpreter import Roulet
+from roulette.database import init_db
+from roulette.interpreter import Roulet
 
 GRAMMAR_PATH = os.path.join(os.path.dirname(__file__), "grammar.tx")
 

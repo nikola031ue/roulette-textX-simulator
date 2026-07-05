@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "roulette-textx-simulator"
+version = "0.1.0"
+description = "A DSL for simulating roulette betting strategies, implemented in Python using the textX library."
+readme = "readme.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Nikola Kostic" },
+    { name = "Marko Tomic" },
+    { name = "Cvetana Despinic" },
+]
+dependencies = [
+    "textx>=4.0",
+]
+
+[project.optional-dependencies]
+lsp = [
+    "pygls",
+    "lsprotocol",
+]
+
+[project.urls]
+Homepage = "https://github.com/nikola031ue/roulette-textX-simulator"
+
+[project.scripts]
+roulette = "roulette.cli:main"
+
+[project.entry-points.textx_languages]
+roul = "roulette:roul_language"
+
+[project.entry-points.textx_generators]
+"roul-dot" = "roulette:roul_dot_generator"
+
+[tool.setuptools]
+packages = ["roulette"]
+
+[tool.setuptools.package-data]
+roulette = ["grammar.tx"]

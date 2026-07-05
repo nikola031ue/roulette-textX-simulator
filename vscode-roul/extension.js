@@ -11,7 +11,7 @@ function activate(context) {
         return;
     }
 
-    const serverScript = path.join(workspaceFolder, 'language_server.py');
+    const serverScript = path.join(workspaceFolder, 'roulette', 'language_server.py');
     const pythonPath = vscode.workspace
         .getConfiguration('python')
         .get('defaultInterpreterPath') || 'python';
