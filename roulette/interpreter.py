@@ -716,4 +716,4 @@ def main(file_name_to_interpret, seed=None, num_seeds=10, save_to_db=True):
 
 
 if __name__ == "__main__":
-    main("test_issue7.rul")
+    main("tests/test_issue7.rul")
