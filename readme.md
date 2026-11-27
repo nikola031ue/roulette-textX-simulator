@@ -1,18 +1,18 @@
-# Rulet DSL textX
+# Roulette DSL textX
 
-Rulet DSL je domain-specific jezik napravljen pomoću textX alata koji
-omogućava korisnicima da opisuju i simuliraju strategije igranja ruleta 
-na jednostavan način.
+Roulette DSL is a domain-specific language built with textX that
+lets users describe and simulate roulette betting strategies
+in a simple way.
 
-Umesto pisanja python koda ili ručnog praćenja rezultata, korisnik bi mogao da napiše kratku skriptu koja bi opisivala tok igre kao na primer početni budžet, tipove opklada, pravila i strategije.
+Instead of writing Python code or tracking results by hand, the user writes a short script that describes the flow of the game, such as the starting budget, bet types, rules and strategies.
 
-Pomoću ovog jezika bi se napravila jasna simulacija ruleta koja je laka za eksperimentisanje. Ovim bi se izbeglo pisanje programskog koda, ručno praćenje rezultata kao i komplikacija sa logikom za ponavljanje. 
-Rulet DSL bi omogućio opis strategije u nekoliko linija, ponavljanja, statistike i slično.
+The language produces a clear roulette simulation that is easy to experiment with. It removes the need to write program code, track results manually or deal with complicated repetition logic.
+Roulette DSL lets you describe a strategy, repetitions, statistics and more in just a few lines.
 
-Krajnji korisnici ovog jezika bi bili igrači koji žele da testiraju svoje strategije i prate analitiku uspešnosti istih bez kucanja koda, excel tabela i ručnih analiza.
+The target users of the language are players who want to test their strategies and track how well they perform, without writing code, building Excel spreadsheets or doing manual analysis.
 
-# Sintaksa
-Primer osnovne sintakse
+# Syntax
+Basic syntax example
 ```
 bankroll 500
 bet red 20
@@ -22,11 +22,11 @@ show_balance
 cash_out
 ```
 
-## Komande
-Komande koje korisnik može da zadaje su vezane za upravljanje novcem (bankroll, cach_out), opklade (bet red 20, bet number 7 5, bet even 20...), tok igre (spin, repeat broj_ponavljanja {...}), kontrola rizika (stop_on_win/loss int), logika za automatizaciju (if_win/lose {...}, double_bet) i informacije (show_stats, show_history).
+## Commands
+The commands available to the user cover money management (bankroll, cash_out), bets (bet red 20, bet number 7 5, bet even 20...), game flow (spin, repeat number_of_repetitions {...}), risk control (stop_on_win/loss int), automation logic (if_win/lose {...}, double_bet) and information (show_stats, show_history).
 
-## Martigale strategija
-Ova strategija podrazmeva povećavanje uloga posle promašaja kako bi nadoknadila prethodne gubitke.
+## Martingale strategy
+This strategy increases the stake after each loss in order to recover previous losses.
 ```
 bankroll 500 
 repeat 15 { 
@@ -42,37 +42,37 @@ repeat 15 {
 cash_out
 ```
 
-# Instalacija i pokretanje
+# Installation and usage
 
 ```bash
 pip install .
-# ili direktno sa GitHub-a
+# or directly from GitHub
 pip install git+https://github.com/nikola031ue/roulette-textX-simulator.git
 ```
 
-Nakon instalacije, dostupna je `roulette` CLI komanda:
+After installation, the `roulette` CLI command is available:
 ```bash
-roulette putanja/do/strategije.rul --seed 42 --num-seeds 20
+roulette path/to/strategy.rul --seed 42 --num-seeds 20
 ```
 
-# VS Code podrška (Syntax Highlighting + LSP)
+# VS Code support (Syntax Highlighting + LSP)
 
-Ekstenzija za VS Code pruža syntax highlighting i Language Server Protocol (LSP) podršku za `.roul` fajlove — uključujući autocomplete i dijagnostiku grešaka u realnom vremenu.
+The VS Code extension provides syntax highlighting and Language Server Protocol (LSP) support for `.roul` files, including autocomplete and real-time error diagnostics.
 
-## Instalacija
+## Installation
 
-**1. Python zavisnosti:**
+**1. Python dependencies:**
 ```bash
 pip install pygls textx
 ```
 
-**2. Node zavisnosti (jednom, u `vscode-roul/` folderu):**
+**2. Node dependencies (once, in the `vscode-roul/` folder):**
 ```bash
 cd vscode-roul
 npm install
 ```
 
-**3. Instalacija ekstenzije u VS Code:**
+**3. Install the extension in VS Code:**
 ```bash
 # Windows
 xcopy /E /I /Y vscode-roul "%USERPROFILE%\.vscode\extensions\roul-language-0.2.0"
@@ -81,38 +81,37 @@ xcopy /E /I /Y vscode-roul "%USERPROFILE%\.vscode\extensions\roul-language-0.2.0
 cp -r vscode-roul ~/.vscode/extensions/roul-language-0.2.0
 ```
 
-**4. Restartuj VS Code** (`Ctrl+Shift+P` → `Developer: Reload Window`)
+**4. Restart VS Code** (`Ctrl+Shift+P` → `Developer: Reload Window`)
 
-## Rezultat
+## Result
 
-- **Syntax highlighting** — bojenje ključnih reči, tipova opklada, uslova i komentara
-- **Autocomplete** — `Ctrl+Space` predlaže sve DSL komande
-- **Dijagnostika** — greške se podvlače crveno odmah pri kucanju
+- **Syntax highlighting**: colors keywords, bet types, conditions and comments
+- **Autocomplete**: `Ctrl+Space` suggests all DSL commands
+- **Diagnostics**: errors are underlined in red as you type
 
 ---
 
-# Validacija i Vizualizacija Gramatike
+# Grammar Validation and Visualization
 
-## Provera ispravnosti textX gramatike
-Da biste proverili da li je `grammar.tx` fajl sintaksno ispravan, koristite textX komandu:
+## Checking the textX grammar
+To check whether the `grammar.tx` file is syntactically valid, use the textX command:
 ```bash
 textx check roulette/grammar.tx
 ```
 
-## Generisanje PNG vizualizacije gramatike
-Za vizualizaciju strukture gramatike, potrebno je generisati DOT fajl i konvertovati ga u PNG:
+## Generating a PNG visualization of the grammar
+To visualize the structure of the grammar, generate a DOT file and convert it to PNG:
 
-1. **Generisanje DOT fajla iz textX gramatike:**
+1. **Generate a DOT file from the textX grammar:**
 ```bash
 textx generate roulette/grammar.tx --target dot
 ```
-Ova komanda generiše `grammar.dot` fajl koji opisuje strukturu gramatike.
+This command generates a `grammar.dot` file that describes the structure of the grammar.
 
-2. **Konvertovanje DOT fajla u PNG:**
+2. **Convert the DOT file to PNG:**
 ```bash
 dot -Tpng -O grammar.dot
 ```
-Ova komanda kreira `grammar.dot.png` fajl sa vizuelnim prikazom gramatike.
+This command creates a `grammar.dot.png` file with a visual representation of the grammar.
 
-**Napomena:** Za generisanje slike potreban je Graphviz alat. Može se preuzeti sa [graphviz.org](https://graphviz.org/download/).
-
+**Note:** Generating the image requires Graphviz, which you can download from [graphviz.org](https://graphviz.org/download/).
